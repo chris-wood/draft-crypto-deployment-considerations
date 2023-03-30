@@ -46,8 +46,8 @@ Computation:
 
 State:
 - No session identifiers or global counters to track state
-- Ephemeral state is okay and modeled with protocol state machines — FROST nonce as state
-- Long term state nonce reuse state is not really feasible — eg Hash based signatures not deployable unless state space is isolated or partitioned
+- Ephemeral state is okay and modeled with protocol state machines, FROST nonce as state
+- Long term state nonce reuse state is not really feasible, eg Hash based signatures not deployable unless state space is isolated or partitioned
 -->
 
 
