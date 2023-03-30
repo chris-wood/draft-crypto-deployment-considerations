@@ -7,7 +7,7 @@ docname: draft-crypto-deployment-considerations-latest
 submissiontype: IRTF
 number:
 date:
-consensus: true
+consensus: false
 v: 3
 
 author:
