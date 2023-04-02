@@ -104,7 +104,7 @@ which may negatively influence the user experience.
 In general, functional properties affect the cost of a solution, where cost can be
 measured in terms of financial expense, battery life or power consumption, or cost to
 the end user experience. Solutions seek to minimize their cost while maximizing their
-quality. 
+quality.
 
 This section describes how these properties are constrained in practice to minimize cost
 and provides examples of how these constraints influenced other relevant quality metrics.
@@ -145,7 +145,7 @@ complexity.
 Minimizing memory consumption -- or state -- is an advantageous goal. However, it's important
 to distinguish what types of memory or state a particular proposes when exploring this
 constraint. There are effectively two types of memory or state that are relevant for
-cryptographic solutions: 
+cryptographic solutions:
 
 1. Long-term state, such as private keying material that exists for repeated runs of a
 cryptographic protocol.
@@ -193,7 +193,7 @@ for which type of state to minimize. Considerations that apply to each are below
    that there is no need to track state across rounds of interaction. A "stateful" protocol
    is one in which the state machine does require state that extends beyond rounds of
    interaction.
-   
+
    There are significant practical differences between stateful and stateless protocols.
    In particular, a stateless protocols maps very cleanly to stateless transport protocols
    such as HTTP, making them much easier to deploy in modern application environments than
@@ -202,7 +202,7 @@ for which type of state to minimize. Considerations that apply to each are below
    strategy might be to store state "on the wire," where this state is encrypted for only one
    party and then transferred between parties, but this requires replay protection and thefore
    yet again some form of local database.)
-   
+
    Not all deployment environments offer some form of local database. Moreover, even for those
    that do, the consistency guarantee of the database may not be that which is necessary for
    the protocol.
@@ -212,7 +212,7 @@ for which type of state to minimize. Considerations that apply to each are below
 The benefit of reducing protocol rounds depends on factors. As described in {{memory}}, minimzing the
 number of rounds to exactly one has the benefit of producing a stateless protocol, thereby easing
 deployment. Assuming all other functional characteristics (computation cost, memory, etc) stay the same,
-reducing the number of rounds decreases the performance profile of the protocol. 
+reducing the number of rounds decreases the performance profile of the protocol.
 However, often reducing the number of rounds negatively affects other aspects of the protocol.
 For example, reducing rounds may require more bandwidth per round, more complicated implementation
 or cryptography in order to provide the same functionality, or it may require a weaker threat model.
@@ -415,7 +415,7 @@ some of these recommendations.
    we pay for simplicity with lack of generality or forward-looking support, or by lesser
    functional properties, but these costs are almost always worth the gains that come from a
    conceptually simple protocol.
-1. Maximize reuse where possible, especially when avoiding reuse only leads to marginal gains. 
+1. Maximize reuse where possible, especially when avoiding reuse only leads to marginal gains.
    Reuse typically means less work for implementers to adopt, communicate, and maintain a solution
    long term.
 1. Collaborate. When in doubt, maintain open lines of communication and collaboration with
