@@ -161,6 +161,7 @@ cryptographic solutions:
 
 1. Long-term state, such as private keying material that exists for repeated runs of a
 cryptographic protocol.
+
 1. Ephemeral state, such as one-time-use key shares and random nonces used for a key
 exchange protocol, that only exists for the duration of a given cryptographic protocol
 and is effectively captured or constrained within the state machine of a protocol.
@@ -220,12 +221,42 @@ for which type of state to minimize. Considerations that apply to each are below
 
 ### Round Trips
 
-<!-- Rounds:
-- Fewer rounds is better. Exactly one round is best, as it does not require memory across rounds of a session.
-- The concept of a session does not map to all deployment environments. HTTP is a common transport, but doesn't have the concept of a "session," and many deployments of HTTP servers do not have a concept of session unless implemented with some form of state.
-- Putting state on the wire (encrypted) requires replay attack mitigations, and therefore state. -->
+The benefit of reducing protocol rounds depends on factors. As described in {{memory}}, minimzing the
+number of rounds to exactly one has the benefit of producing a stateless protocol, thereby easing
+deployment. Assuming all other functional characteristics (computation cost, memory, etc) stay the same,
+reducing the number of rounds decreases the performance profile of the protocol. 
+However, often reducing the number of rounds negatively affects other aspects of the protocol.
+For example, reducing rounds may require more bandwidth per round, more complicated implementation
+or cryptography in order to provide the same functionality, or it may require a weaker threat model.
+
+As an example, some protocols are specified with a notion of preprocessing, wherein one or
+more parties do some amount of work a priori, either locally or in collaboration with other
+parties, in order to simplify the main online protocol. As an example, the {{?FROST=I-D.irtf-cfrg-frost}}
+threshold signature protocol consists of two phases, one of which can be done offline by
+signing parties in a preprocessing phase. Splitting protocols into an offline and online
+phase can help reduce the cost of the online phase, but necessarily requires coordination
+between the offline and online phases. As described in {{memory}}, technologies for
+coordination may or may not be available for a particular deployment environment.
+
+As another example, some applications of zero knowledge proofs involve an offline phase that's
+done to minimize the cost of proof generation in the online phase. This split is done for
+practical reasons: proof generation without precomputation can be expensive. However, implementations
+that use such precomputation are almost always more complicated in practice. Precomputation
+is done by some process that's running in the background and separated from processes that
+wish to use the output of this precomputation in the online phase. This means there must now
+exist some form of IPC between these processes, and, additionally, requires that the process
+implementing the online phase implement some form of input validation.
+
+As a final note, there is little difference between two or more rounds in a stateful protocol
+from an implementation perspective. Any protocol which requires two rounds must necessarily
+have some mechanism for dealing with state across the rounds, and this mechanism can also be
+used for storing state across any subsequent rounds. Thus, practically speaking, unless there
+are performance reasons to do so, optimizing a protocol with more complicated cryptography to
+reduce the number of rounds from more than two to exactly two is often not a desirable tradeoff.
 
 ### Bandwidth
+
+
 
 <!-- Bandwidth:
 - Message sizes do have a practical limit depending on the underlying transport. They might influence transport characteristics and lead to worse performance. Sometimes the headers might not even fit in the presence of middleboxes. -->
@@ -233,10 +264,11 @@ for which type of state to minimize. Considerations that apply to each are below
 ## Implementation and Maintenance Constraints
 
 XXX: new code, new attack surface, formal verification, long-term maintenance, new API surface, etc
-
-## Shipping Constraints
-
 XXX: time pressure to ship, minimize complexity to get something out the door
+
+## Runtime Constraints
+
+XXX: no synchronized clocks, 
 
 ## Ecosystem Constraints
 
@@ -252,7 +284,9 @@ XXX: recommentations for researchers (always choose simplicity of implementation
 
 # Security Considerations
 
-TODO Security
+This document discusses considerations relevant to the implementation and deployment
+of cryptography in practice. The document is effectively a collection of security
+considerations.
 
 
 # IANA Considerations
