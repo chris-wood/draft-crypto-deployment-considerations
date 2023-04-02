@@ -74,15 +74,8 @@ The target audience of this document is cryptographic and security researchers w
 are working on solutions to problems that exist in the real world.
 
 <!--
-Prompt: What are practical considerations for deploying cryptographic protocols, especially surrounding bandwidth, rounds, memory, and computation limits? For each item, give an example about from practice.
-
-Communication and coordination:
-- Broadcast is bad, unicast is good. Mutually authenticated channels are good.
-- Protocols that require coordination across different parties are complicated to implement and ship in practice.
--->
-
-<!-- 
-Real World Examples: iCloud Private Relay, Private Access Tokens, GeoKDLv2, Prio (ENPA), STAR, QUIC, WireGuard, ZCash(?), WhatsApp E2E encrypted backup (no threshold OPRF)
+TODO: include discussion about communication. Broadcast is bad, unicast is good. Mutually authenticated channels are good.
+TODO: Real world examples to thread into the discussion include iCloud Private Relay, Private Access Tokens, GeoKDLv2, Prio (ENPA), STAR, QUIC, WireGuard, ZCash(?), WhatsApp E2E encrypted backup (no threshold OPRF)
 -->
 
 # Conventions and Definitions
@@ -98,7 +91,7 @@ solutions can be costly in the best case or have security vulnerabilities in the
 case. This section discusses constraints that influence how these tradeoffs are made in
 practice.
 
-## Functional Constraints
+## Functional Tradeoffs
 
 Functional constraints determine what functional properties of a solution are feasible
 for a particular deployment. The functional properties of a cryptographic solution
@@ -287,7 +280,7 @@ the size of these signatures would overshadow the size of application data that 
 these tokens, effectively hindering deployment of the solution. In the particular case of
 Privacy Pass, this may mean that alternate cryptographic solutions may be required.
 
-## Implementation Constraints
+## Implementation Tradeoffs
 
 Beyond the functional constraints that one must consider before choosing a
 protocol to deploy, there are also practical implementation constraints that
@@ -327,7 +320,12 @@ solution is the long-term maintenance cost. There are many factors that go into 
    the cryptographic solution. For example, imagine a contact discovery application built on
    some version of private information retrieval (PIR). The dependents of the PIR technology
    are not necessarily applications that invoke the system, but the end users themselves, who
-   come to expect certain privacy properties for contact discovery.
+   come to expect certain privacy properties for contact discovery. New cryptographic solutions
+   may require new conceptual mental models for users that they are unfamiliar with, making it
+   difficult for end users to meaningfully engage with the system. As a relevant example, it seems
+   unclear how one would succinctly explain concepts like multiparty computation to a layperson.
+   The cost of educating and informing such users about relevant details of the system should
+   be factored in where appropriate.
 
    Another relevant example is the deployment of cryptographic solutions with no obvious
    post quantum upgrade path. Consider the design of non-trivial anonymous credential systems
@@ -347,6 +345,8 @@ solution is the long-term maintenance cost. There are many factors that go into 
    new internal dependencies mean that these dependencies must be actively maintained going
    forward. If there are bugs or security vulnerabilities reported, they must be patched.
 
+   <!-- TODO: ECVRF vs ristretto255-VRF  -->
+
 1. Knowledge cost. Sometimes the engineers that bringup a solution are not those that
    maintain a solution long-term. This is often true when, for example, production services
    transfer from an engineering team actively building a service to a service reliability
@@ -365,19 +365,63 @@ only slightly better functional properties. The long-term maintenance costs are 
 provided the proposed cryptographic solution has noticably better functional, security,
 or privacy properties.
 
-## Ecosystem Constraints
+## Ecosystem Tradeoffs
 
-XXX: reuse and adoption is better than new stuff
-XXX: assumptions about infra are invalid, eg Tor or HSMs or enclaves
+Constraints and considerations for cryptographic solutions also extend to the ecosystem
+in which they are deployed. Cryptographic solutions that solve many diverse problems
+are generally better than those which are single purpose. As a practical example,
+iCloud Private Relay and Private Access Tokens both use blind RSA {{?BLINDRSA=I-D.irtf-cfrg-rsa-blind-signatures}}
+as a form of anonymous credential in part because the same protocol could fit multiple
+use cases. In fact, blind RSA has been proposed as a solution to more use cases
+in practice, including those around anti-abuse for privacy-preserving ad click attribution.
+It would have been possible to use VOPRFs for iCloud Private Relay and blind RSA
+for Privacy Pass for performance reasons, but implementing fewer cryptographic
+primitives offered more value than slight improvements in functional properties.
 
-## Usability Constraints
+Beyond solution reuse, there is also value in implementation reuse. Using blind RSA
+as another example, this particular protocol only requires the client and signer
+to support the protocol; it does not require the verifier of the protocol to implement
+any new cryptography, since most popular cryptographic libraries support RSA signature
+verification. This meant that use of blind RSA for these two use cases described above
+eased adoption for consumers of blind RSA tokens by not forcing any new cryptographic
+solutions onto verifiers.
 
-XXX: user stuff is hard...
+Cryptographic solutions sometimes also make inaccurate assumptions about deployment
+environments, or fail to factor in properties of existing deployments. For example,
+some cryptographic protocols are designed with specific algorithms baked into the
+specification, sometimes because these algorithms offer better security properties,
+but these algorithms do not have widespread deployment in existing infrastructure.
+As an example, most hardware software modules (HSMs) are quite limited in the types
+of algorithms they support. For instance, some only support a variety of NIST curves.
+As such, in deployments where this limitation exists, cryptographic solutions that
+require an elliptic curve as the basis for a prime-order group will lean towards solutions
+built on NIST curves, as doing so accommodates existing deployed infrastructure.
+
+<!-- ## Usability Constraints
+
+XXX: user stuff is hard... protocols that require proper use are less good than those that don't require proper use (this means reusing concepts rather than building cryptography that introduces new concepts for users to grok -->
 
 # General Recommendations
 
-XXX: recommentations for researchers (always choose simplicity of implementation, maximize reuse where possible, collaborate openly)
+This document discusses a number of considerations and constraints that influence
+how engineering decisions are made. Again, there is certainly no single set of
+standard best practices or recommendations that would guide towards a consistent
+outcome. However, there are very general practices that do empirically yield positive
+outcomes for the deployment of cryptographic solutions. This section discusses
+some of these recommendations.
 
+1. Always favor simplicity. Simplicity will almost always yield the best outcomes. Simple
+   protocols and algorithms are easier to understand, implement, and ultimately deploy. Sometimes
+   we pay for simplicity with lack of generality or forward-looking support, or by lesser
+   functional properties, but these costs are almost always worth the gains that come from a
+   conceptually simple protocol.
+1. Maximize reuse where possible, especially when avoiding reuse only leads to marginal gains. 
+   Reuse typically means less work for implementers to adopt, communicate, and maintain a solution
+   long term.
+1. Collaborate. When in doubt, maintain open lines of communication and collaboration with
+   industry to help navigate the many dimensions of tradeoffs discussed in this document.
+   This isn't always feasible, especially for industry sectors that work in isolation or
+   secret, but where feasible, leverage the opportunity.
 
 # Security Considerations
 
