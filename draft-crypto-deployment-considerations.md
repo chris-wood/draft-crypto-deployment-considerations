@@ -79,9 +79,6 @@ Prompt: What are practical considerations for deploying cryptographic protocols,
 Communication and coordination:
 - Broadcast is bad, unicast is good. Mutually authenticated channels are good.
 - Protocols that require coordination across different parties are complicated to implement and ship in practice.
-
-Maintenance:
-- Cost of implementing new cryptographic primitives is high since there's a long-term maintenance cost. Formally verified implementations help, but may not be enough.
 -->
 
 <!-- 
@@ -92,16 +89,14 @@ Real World Examples: iCloud Private Relay, Private Access Tokens, GeoKDLv2, Prio
 
 {::boilerplate bcp14-tagged}
 
-# Engineering Constraints
+# Engineering Tradeoffs
 
 Engineering is a balancing act of tradeoffs with the end goal of providing high value
 solutions. For problems that require (in part) cryptographic solutions, balancing the
 different real world constraints well is particularly important. Improper or incorrect
 solutions can be costly in the best case or have security vulnerabilities in the worst
-case.
-
-This section discusses constraints that influence how these tradeoffs are made in
-practice. XXX(caw): finishme
+case. This section discusses constraints that influence how these tradeoffs are made in
+practice.
 
 ## Functional Constraints
 
@@ -252,27 +247,128 @@ from an implementation perspective. Any protocol which requires two rounds must 
 have some mechanism for dealing with state across the rounds, and this mechanism can also be
 used for storing state across any subsequent rounds. Thus, practically speaking, unless there
 are performance reasons to do so, optimizing a protocol with more complicated cryptography to
-reduce the number of rounds from more than two to exactly two is often not a desirable tradeoff.
+reduce the number of rounds from three or more to exactly two is often not a desirable tradeoff.
 
 ### Bandwidth
 
+Minimizing bandwidth is an important goal of a cryptographic protocol depending on the
+deployment environment. Some deployments have access to a transport protocol without
+practical bandwidth constraints. Examples of such protocols include applications built
+over TLS, QUIC, or HTTP. Such protocols expose streams to applications, where said
+streams have no practical input length restrictions. In such settings, reducing bandwidth
+can help improve performance by decreasing the time to transfer messages, assuming
+the number of rounds, computation, or memory requirements do not increase as a result.
+However, in practice, protocols that have no theoretical limit may experience practical
+limits:
 
+1. HTTP implementations can limit the size of headers that are used to convey information
+   between recipients. As this is an implementation detail, the exact limit is not well
+   established. Nevertheless, the fact that these limits exist means that protocols using
+   HTTP in this manner must take precaution.
+1. TCP segment and QUIC packet sizes have a maximum length, and sending messages that exceed
+   the size of these lengths means that multiple packets will be sent, some of which are
+   at the maximum size of each packet. Some networks can react poorly to such packets, e.g.,
+   by dropping them from an active connection, causing the transport protocol retranmission
+   logic to retransmit them.
 
-<!-- Bandwidth:
-- Message sizes do have a practical limit depending on the underlying transport. They might influence transport characteristics and lead to worse performance. Sometimes the headers might not even fit in the presence of middleboxes. -->
+Some protocols have constraints that are imposed by the underlying protocol. For example,
+protocols like DNS have strict message limits codified by the wire format, meaning it
+is not possible to exceed these limits. Deployments of post quantum cryptographic solutions
+for DNSSEC, especially post quantum signatures, will face these bandwidth limits.
+Depending on these limits, alternative cryptographic solutions may be necessary to solve
+the problem. One recent example of this is [DAVIDBEN], wherein all digital signatures in
+TLS handshake were replaced by compact Merkle Tree proofs.
 
-## Implementation and Maintenance Constraints
+Reducing bandwidth to avoid practical or theoretical limits is advantageous. This
+is especially true if the bandwidth cost exceeds the bandwidth cost of actual application data.
+As an example, Privacy Pass could theoretically use post quantum blind signature protocols
+for producing one-time-use anonymous tokens. However, in most practical applications,
+the size of these signatures would overshadow the size of application data that accompanies
+these tokens, effectively hindering deployment of the solution. In the particular case of
+Privacy Pass, this may mean that alternate cryptographic solutions may be required.
 
-XXX: new code, new attack surface, formal verification, long-term maintenance, new API surface, etc
-XXX: time pressure to ship, minimize complexity to get something out the door
+## Implementation Constraints
 
-## Runtime Constraints
+Beyond the functional constraints that one must consider before choosing a
+protocol to deploy, there are also practical implementation constraints that
+affect deployment, including those that are paid up front to ship a solution,
+and then those that are paid after the solution has been shipped.
 
-XXX: no synchronized clocks, 
+### Bootstrapping Cost
+
+Implementing new cryptography of any form requires care. Maybe the new cryptography
+is not yet specified, and thereby the cost of implementing it requires careful collaboration
+with cryptographic experts. Alternatively, maybe there are time pressures to deliver a
+solution for the desired problem in a timely manner, thereby motivating simpler and
+easier-to-implement solutions, even ones with less-than-ideal security or privacy properties,
+over more complicated but perhaps ultimately better solutions.
+
+Solutions for products often face this tradeoff, and navigating the space of solutions
+that are faster and easier to ship compared to truly superior solutions boils down to
+product priorities. Cryptographic researchers can help mitigate this tradeoff by
+simplifying their protocols and, ideally, complementing their work with detailed
+specifications to facilitate implementation.
+
+### Long-Term Maintenance Cost
+
+Perhaps the most important implementation factor to consider when choosing a cryptographic
+solution is the long-term maintenance cost. There are many factors that go into this cost.
+
+1. External dependencies. Implementing a cryptographic solution that is exposed to users
+   through an API or some other way means that implementations must continue to maintain and update
+   this functionality over time. If there are bugs or security vulnerabilities, they must be fixed.
+   External dependencies of this nature tend to inevitably ossify in practice, meaning that it
+   is difficult to transition users off the solution and towards something better. Cryptographic
+   solutions with no external users are much easier to manage long term as they do not require
+   coordination or a more thoughtful deprecation strategy.
+
+   It's important to note that external dependencies may not always come in the form of a user
+   calling some new API. Such dependencies can be through high-level features that are built on
+   the cryptographic solution. For example, imagine a contact discovery application built on
+   some version of private information retrieval (PIR). The dependents of the PIR technology
+   are not necessarily applications that invoke the system, but the end users themselves, who
+   come to expect certain privacy properties for contact discovery.
+
+   Another relevant example is the deployment of cryptographic solutions with no obvious
+   post quantum upgrade path. Consider the design of non-trivial anonymous credential systems
+   built on pairing-friendly curves, e.g., such as those built with {{?BBS=I-D.irtf-cfrg-bbs}}
+   and {{?BLS=I-D.irtf-cfrg-bls}} under the hood. Pairings do not currently have a post-quantum
+   variant. As such, any application that deploys these anonymous credentials potentially
+   introduces a new feature for users that cannot be replicated in the advent of a post quantum
+   capable attacker. Deploying technology with such limitations in place ultimately does a
+   disservice to the end user.
+
+1. Internal dependencies. Implementing new cryptographic solutions that pull in new cryptographic
+   dependencies is also problematic. Depending on the platform and deployment environment, new
+   dependencies can be problematic for a number of reasons. They may introduce new code into
+   production, thereby expanding the attack surface. Auditing or verifying these dependencies
+   can help, but is imperfect. New dependencies can lead to code and binary bloat, especially
+   with cryptographic implementations that do not themselves minimize dependencies. Finally,
+   new internal dependencies mean that these dependencies must be actively maintained going
+   forward. If there are bugs or security vulnerabilities reported, they must be patched.
+
+1. Knowledge cost. Sometimes the engineers that bringup a solution are not those that
+   maintain a solution long-term. This is often true when, for example, production services
+   transfer from an engineering team actively building a service to a service reliability
+   team that maintains it. Successful maintenance of a cryptographic solution generally
+   requires some working knowledge of this system in order to ease SRE costs, and there is
+   a cost in transferring this knowledge across teams. This cost is paid in the development of
+   training, education, and documentation resources, for example. This cost can be paid
+   through the natural course of product development, or other change in product ownership,
+   e.g., if an knowledgeable engineer leaves the project or the project is transferred to
+   another team.
+
+For these reasons, cryptographic solutions that minimize new dependencies, reuse existing
+cryptographic components, and are accommodating to future threat models (such as post quantum
+attackers) are highly desirable and, in practice, will often eclipse solutions that offer
+only slightly better functional properties. The long-term maintenance costs are bearable
+provided the proposed cryptographic solution has noticably better functional, security,
+or privacy properties.
 
 ## Ecosystem Constraints
 
 XXX: reuse and adoption is better than new stuff
+XXX: assumptions about infra are invalid, eg Tor or HSMs or enclaves
 
 ## Usability Constraints
 
@@ -281,6 +377,7 @@ XXX: user stuff is hard...
 # General Recommendations
 
 XXX: recommentations for researchers (always choose simplicity of implementation, maximize reuse where possible, collaborate openly)
+
 
 # Security Considerations
 
