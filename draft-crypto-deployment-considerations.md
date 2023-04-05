@@ -54,21 +54,20 @@ Finally, constraints can also apply to pragmatic engineering considerations beyo
 the functional properties of a cryptographic solution, such as the long-term
 maintenance costs of implementing a particular algorithm or solution.
 
-There is no single standard or set of requirements by which applications determine
-what type of cryptographic solution is best for their problem. However, awareness
-of these real world requirements or constraints can help in navigating the solution
-space by designing cryptographic algorithms or protocols. In particular, understanding
-the considerations that apply to real world deployments of cryptographic solutions
-can help narrow the design space for a particular problem. It can also help ease the
-transition from novel cryptographic research into practice.
+Engineering is a balancing act of tradeoffs with the end goal of providing high
+value solutions. For problems that require (in part) cryptographic solutions,
+balancing the different real world constraints well is particularly important.
+Improper or incorrect solutions can be costly in the best case or have security
+vulnerabilities in the worst case. Awareness of the real world requirements or
+constraints that influence engineering and deployment decisions can help navigating
+the solution space by designing cryptographic algorithms or protocols.
 
-The intent of this document is twofold. The first objective of this document is to
-discuss constraints and requirements that are factored into the implementation and
-deployment of real world cryptographic solutions. These considerations may not be
-exhaustive, and contributions which extend this list of considerations are certainly
-welcome. The second objective of this document is to survey concrete examples of
-deployed cryptography to illustrate how certain tradeoffs with respect to these
-constraints and requirements were made.
+To that end, the intent of this document is twofold. The first objective of this
+document is to discuss constraints and requirements that are factored into the
+implementation and deployment of real world cryptographic solutions.
+The second objective of this document is to survey concrete examples of deployed
+cryptography to illustrate how certain tradeoffs with respect to these constraints
+and requirements were made.
 
 The target audience of this document is cryptographic and security researchers who
 are working on solutions to problems that exist in the real world.
@@ -82,16 +81,7 @@ TODO: Real world examples to thread into the discussion include iCloud Private R
 
 {::boilerplate bcp14-tagged}
 
-# Engineering Tradeoffs
-
-Engineering is a balancing act of tradeoffs with the end goal of providing high value
-solutions. For problems that require (in part) cryptographic solutions, balancing the
-different real world constraints well is particularly important. Improper or incorrect
-solutions can be costly in the best case or have security vulnerabilities in the worst
-case. This section discusses constraints that influence how these tradeoffs are made in
-practice.
-
-## Functional Tradeoffs
+# Functional Considerations
 
 Functional constraints determine what functional properties of a solution are feasible
 for a particular deployment. The functional properties of a cryptographic solution
@@ -109,7 +99,7 @@ quality.
 This section describes how these properties are constrained in practice to minimize cost
 and provides examples of how these constraints influenced other relevant quality metrics.
 
-### Computation
+## Computation
 
 Minimizing computation is generally always better, but only up to a point. For example,
 consider the problem of authenticated key exchange with TLS. The actual key exchange step
@@ -140,7 +130,7 @@ VOPRF signer needs to implement batching and the logic necessary to handle batch
 in a timely manner. Thus, this decrease in computation comes at the cost of implementation
 complexity.
 
-### Memory
+## Memory
 
 Minimizing memory consumption -- or state -- is an advantageous goal. However, it's important
 to distinguish what types of memory or state a particular proposes when exploring this
@@ -207,7 +197,7 @@ for which type of state to minimize. Considerations that apply to each are below
    that do, the consistency guarantee of the database may not be that which is necessary for
    the protocol.
 
-### Round Trips
+## Round Trips
 
 The benefit of reducing protocol rounds depends on factors. As described in {{memory}}, minimzing the
 number of rounds to exactly one has the benefit of producing a stateless protocol, thereby easing
@@ -242,7 +232,7 @@ used for storing state across any subsequent rounds. Thus, practically speaking,
 are performance reasons to do so, optimizing a protocol with more complicated cryptography to
 reduce the number of rounds from three or more to exactly two is often not a desirable tradeoff.
 
-### Bandwidth
+## Bandwidth
 
 Minimizing bandwidth is an important goal of a cryptographic protocol depending on the
 deployment environment. Some deployments have access to a transport protocol without
@@ -280,14 +270,14 @@ the size of these signatures would overshadow the size of application data that 
 these tokens, effectively hindering deployment of the solution. In the particular case of
 Privacy Pass, this may mean that alternate cryptographic solutions may be required.
 
-## Implementation Tradeoffs
+# Implementation Considerations
 
 Beyond the functional constraints that one must consider before choosing a
 protocol to deploy, there are also practical implementation constraints that
 affect deployment, including those that are paid up front to ship a solution,
 and then those that are paid after the solution has been shipped.
 
-### Bootstrapping Cost
+## Bootstrapping
 
 Implementing new cryptography of any form requires care. Maybe the new cryptography
 is not yet specified, and thereby the cost of implementing it requires careful collaboration
@@ -302,7 +292,7 @@ product priorities. Cryptographic researchers can help mitigate this tradeoff by
 simplifying their protocols and, ideally, complementing their work with detailed
 specifications to facilitate implementation.
 
-### Long-Term Maintenance Cost
+## Long-Term Maintenance
 
 Perhaps the most important implementation factor to consider when choosing a cryptographic
 solution is the long-term maintenance cost. There are many factors that go into this cost.
@@ -365,7 +355,7 @@ only slightly better functional properties. The long-term maintenance costs are 
 provided the proposed cryptographic solution has noticably better functional, security,
 or privacy properties.
 
-## Ecosystem Tradeoffs
+# Ecosystem and Adoption Considerations
 
 Constraints and considerations for cryptographic solutions also extend to the ecosystem
 in which they are deployed. Cryptographic solutions that solve many diverse problems
