@@ -19,6 +19,9 @@ author:
 normative:
 
 informative:
+    hacspec:
+        title: "hacspec: A specification language for crypto primitives in Rust"
+        target: https://github.com/hacspec/hacspec
 
 
 --- abstract
@@ -326,8 +329,8 @@ solution is the long-term maintenance cost. There are many factors that go into 
 
    Another relevant example is the deployment of cryptographic solutions with no obvious
    post quantum upgrade path. Consider the design of non-trivial anonymous credential systems
-   built on pairing-friendly curves, e.g., such as those built with {{?BBS=I-D.irtf-cfrg-bbs}}
-   and {{?BLS=I-D.irtf-cfrg-bls}} under the hood. Pairings do not currently have a post-quantum
+   built on pairing-friendly curves, e.g., such as those built with {{?BBS=I-D.irtf-cfrg-bbs-signatures}}
+   and {{?BLS=I-D.irtf-cfrg-bls-signature}} under the hood. Pairings do not currently have a post-quantum
    variant. As such, any application that deploys these anonymous credentials potentially
    introduces a new feature for users that cannot be replicated in the advent of a post quantum
    capable attacker. Deploying technology with such limitations in place ultimately does a
