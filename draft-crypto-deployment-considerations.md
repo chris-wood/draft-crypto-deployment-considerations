@@ -259,8 +259,8 @@ protocols like DNS have strict message limits codified by the wire format, meani
 is not possible to exceed these limits. Deployments of post quantum cryptographic solutions
 for DNSSEC, especially post quantum signatures, will face these bandwidth limits.
 Depending on these limits, alternative cryptographic solutions may be necessary to solve
-the problem. One recent example of this is [DAVIDBEN], wherein all digital signatures in
-TLS handshake were replaced by compact Merkle Tree proofs.
+the problem. One recent example of this is {{?MERKLETREECERTS=I-D.davidben-tls-merkle-tree-certs}},
+wherein effectively all digital signatures in TLS handshake were replaced by compact Merkle Tree proofs.
 
 Reducing bandwidth to avoid practical or theoretical limits is advantageous. This
 is especially true if the bandwidth cost exceeds the bandwidth cost of actual application data.
@@ -275,22 +275,29 @@ Privacy Pass, this may mean that alternate cryptographic solutions may be requir
 Beyond the functional constraints that one must consider before choosing a
 protocol to deploy, there are also practical implementation constraints that
 affect deployment, including those that are paid up front to ship a solution,
-and then those that are paid after the solution has been shipped.
+referred to as bootstrapping costs, and then those that are paid after the
+solution has been shipped.
 
 ## Bootstrapping
 
-Implementing new cryptography of any form requires care. Maybe the new cryptography
-is not yet specified, and thereby the cost of implementing it requires careful collaboration
-with cryptographic experts. Alternatively, maybe there are time pressures to deliver a
-solution for the desired problem in a timely manner, thereby motivating simpler and
-easier-to-implement solutions, even ones with less-than-ideal security or privacy properties,
-over more complicated but perhaps ultimately better solutions.
+Implementing new cryptography of any form always has a cost. For example, perhaps the
+new cryptography is not yet specified and exists only in academic literature. In this case,
+the cost of implementing it requires careful collaboration with cryptographic experts.
+In other cases, perhaps the cryptography is well understood and specified, but for licensing
+reasons it's not possible to reuse existing implementations. In this case, the cost comes
+from re-implementing, which comes with additional risk of introducing bugs not found in
+other implementations.
 
-Solutions for products often face this tradeoff, and navigating the space of solutions
-that are faster and easier to ship compared to truly superior solutions boils down to
-product priorities. Cryptographic researchers can help mitigate this tradeoff by
-simplifying their protocols and, ideally, complementing their work with detailed
-specifications to facilitate implementation.
+Even when these bootstrapping costs seem small, they may matter in practice. There are
+often time pressures to deliver a solution for the desired problem in a timely manner.
+Product deadlines push towards simple and easy-to-implement solutions, sometimes even
+ones with less-than-ideal security or privacy properties, over more complicated but
+perhaps ultimately better solutions. Cryptographic researchers can help mitigate this
+tradeoff in practice by working to ensure that the cost of implementing their work is
+minimal. That might mean simplifying protocols, producing technical specifications that
+faciliate engineering work, producing verified implementations that are provably correct
+with tools such as {{hacspec}}, or even releasing high quality production software that
+could be used without license constraints.
 
 ## Long-Term Maintenance
 
