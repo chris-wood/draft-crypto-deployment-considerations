@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2023-04-06T00:03:05.449917+00:00",
+  "timestamp": "2023-04-09T00:03:15.266379+00:00",
   "repo": "chris-wood/draft-crypto-deployment-considerations",
   "labels": [
     {
@@ -49,7 +49,72 @@
       "color": "ffffff"
     }
   ],
-  "issues": [],
+  "issues": [
+    {
+      "number": 5,
+      "id": "I_kwDOJQZP185ixQmK",
+      "title": "Memory constraints",
+      "url": "https://github.com/chris-wood/draft-crypto-deployment-considerations/issues/5",
+      "state": "OPEN",
+      "author": "chris-wood",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "From @bwesterb:\r\n\r\n> Under memory you could mention that memory (and code size) are a huge deal for (the lower end of) embedded platforms. A yubikey, for instance, only has a few kilobytes of RAM. And, for custom hardware, RAM is typically more expensive than recomputing some stuff.\r\n\r\n",
+      "createdAt": "2023-04-06T09:56:04Z",
+      "updatedAt": "2023-04-06T09:56:04Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 6,
+      "id": "I_kwDOJQZP185ixRGh",
+      "title": "Compute and round trip tradeoffs",
+      "url": "https://github.com/chris-wood/draft-crypto-deployment-considerations/issues/6",
+      "state": "OPEN",
+      "author": "chris-wood",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "From @bwesterb:\r\n\r\n> \"However, minimizing the cost of this step is only useful up to the point where the cost of network round trips exceeds that of the key exchange computation.\"\r\n> \r\n> Nit picking: this suggests that if key exchange is faster than the RTT (or something like that), that it's then fast enough. Don't think that is: we'd need to buy a lot of extra servers and it'd be a big drain on battery if a single kex takes 50ms. Also except for keygen, key exchange can't be done in parallel, so it's always a bottleneck so to say.\r\n\r\nThis is a fair point and something worth clarifying further.",
+      "createdAt": "2023-04-06T09:57:20Z",
+      "updatedAt": "2023-04-06T09:57:20Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 7,
+      "id": "I_kwDOJQZP185ixRyI",
+      "title": "Round trips and bandwidth",
+      "url": "https://github.com/chris-wood/draft-crypto-deployment-considerations/issues/7",
+      "state": "OPEN",
+      "author": "chris-wood",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "High bandwidth costs may increase round trips at the transport layer, e.g., if congestion windows fill up and can only be cleared via explicit acknowledgements. ",
+      "createdAt": "2023-04-06T09:58:53Z",
+      "updatedAt": "2023-04-06T09:58:53Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 8,
+      "id": "I_kwDOJQZP185ixYCE",
+      "title": "Concrete parameters",
+      "url": "https://github.com/chris-wood/draft-crypto-deployment-considerations/issues/8",
+      "state": "OPEN",
+      "author": "chris-wood",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "From @bwesterb:\r\n\r\n> Cryptography protocols should come with concrete chosen parameters.",
+      "createdAt": "2023-04-06T10:13:01Z",
+      "updatedAt": "2023-04-06T10:13:01Z",
+      "closedAt": null,
+      "comments": []
+    }
+  ],
   "pulls": [
     {
       "number": 1,
