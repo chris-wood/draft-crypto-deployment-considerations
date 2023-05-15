@@ -4,8 +4,8 @@
 
 Network Working Group                                         C. A. Wood
 Internet-Draft                                                Cloudflare
-Intended status: Informational                              2 April 2023
-Expires: 4 October 2023
+Intended status: Informational                               15 May 2023
+Expires: 16 November 2023
 
 
          Deployment Considerations for Cryptographic Protocols
@@ -49,7 +49,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 4 October 2023.
+   This Internet-Draft will expire on 16 November 2023.
 
 Copyright Notice
 
@@ -66,22 +66,21 @@ Table of Contents
 
    1.  Introduction
    2.  Conventions and Definitions
-   3.  Engineering Tradeoffs
-     3.1.  Functional Tradeoffs
-       3.1.1.  Computation
-       3.1.2.  Memory
-       3.1.3.  Round Trips
-       3.1.4.  Bandwidth
-     3.2.  Implementation Tradeoffs
-       3.2.1.  Bootstrapping Cost
-       3.2.2.  Long-Term Maintenance Cost
-     3.3.  Ecosystem Tradeoffs
-   4.  General Recommendations
-   5.  Security Considerations
-   6.  IANA Considerations
-   7.  References
-     7.1.  Normative References
-     7.2.  Informative References
+   3.  Functional Considerations
+     3.1.  Computation
+     3.2.  Memory
+     3.3.  Round Trips
+     3.4.  Bandwidth
+   4.  Implementation Considerations
+     4.1.  Bootstrapping
+     4.2.  Long-Term Maintenance
+   5.  Ecosystem and Adoption Considerations
+   6.  General Recommendations
+   7.  Security Considerations
+   8.  IANA Considerations
+   9.  References
+     9.1.  Normative References
+     9.2.  Informative References
    Acknowledgments
    Author's Address
 
@@ -105,24 +104,23 @@ Table of Contents
    solution, such as the long-term maintenance costs of implementing a
    particular algorithm or solution.
 
-   There is no single standard or set of requirements by which
-   applications determine what type of cryptographic solution is best
-   for their problem.  However, awareness of these real world
-   requirements or constraints can help in navigating the solution space
-   by designing cryptographic algorithms or protocols.  In particular,
-   understanding the considerations that apply to real world deployments
-   of cryptographic solutions can help narrow the design space for a
-   particular problem.  It can also help ease the transition from novel
-   cryptographic research into practice.
+   Engineering is a balancing act of tradeoffs with the end goal of
+   providing high value solutions.  For problems that require (in part)
+   cryptographic solutions, balancing the different real world
+   constraints well is particularly important.  Improper or incorrect
+   solutions can be costly in the best case or have security
+   vulnerabilities in the worst case.  Awareness of the real world
+   requirements or constraints that influence engineering and deployment
+   decisions can help navigating the solution space by designing
+   cryptographic algorithms or protocols.
 
-   The intent of this document is twofold.  The first objective of this
-   document is to discuss constraints and requirements that are factored
-   into the implementation and deployment of real world cryptographic
-   solutions.  These considerations may not be exhaustive, and
-   contributions which extend this list of considerations are certainly
-   welcome.  The second objective of this document is to survey concrete
-   examples of deployed cryptography to illustrate how certain tradeoffs
-   with respect to these constraints and requirements were made.
+   To that end, the intent of this document is twofold.  The first
+   objective of this document is to discuss constraints and requirements
+   that are factored into the implementation and deployment of real
+   world cryptographic solutions.  The second objective of this document
+   is to survey concrete examples of deployed cryptography to illustrate
+   how certain tradeoffs with respect to these constraints and
+   requirements were made.
 
    The target audience of this document is cryptographic and security
    researchers who are working on solutions to problems that exist in
@@ -136,17 +134,7 @@ Table of Contents
    BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
    capitals, as shown here.
 
-3.  Engineering Tradeoffs
-
-   Engineering is a balancing act of tradeoffs with the end goal of
-   providing high value solutions.  For problems that require (in part)
-   cryptographic solutions, balancing the different real world
-   constraints well is particularly important.  Improper or incorrect
-   solutions can be costly in the best case or have security
-   vulnerabilities in the worst case.  This section discusses
-   constraints that influence how these tradeoffs are made in practice.
-
-3.1.  Functional Tradeoffs
+3.  Functional Considerations
 
    Functional constraints determine what functional properties of a
    solution are feasible for a particular deployment.  The functional
@@ -167,7 +155,7 @@ Table of Contents
    practice to minimize cost and provides examples of how these
    constraints influenced other relevant quality metrics.
 
-3.1.1.  Computation
+3.1.  Computation
 
    Minimizing computation is generally always better, but only up to a
    point.  For example, consider the problem of authenticated key
@@ -207,7 +195,7 @@ Table of Contents
    decrease in computation comes at the cost of implementation
    complexity.
 
-3.1.2.  Memory
+3.2.  Memory
 
    Minimizing memory consumption -- or state -- is an advantageous goal.
    However, it's important to distinguish what types of memory or state
@@ -292,10 +280,10 @@ Table of Contents
        guarantee of the database may not be that which is necessary for
        the protocol.
 
-3.1.3.  Round Trips
+3.3.  Round Trips
 
    The benefit of reducing protocol rounds depends on factors.  As
-   described in Section 3.1.2, minimzing the number of rounds to exactly
+   described in Section 3.2, minimzing the number of rounds to exactly
    one has the benefit of producing a stateless protocol, thereby easing
    deployment.  Assuming all other functional characteristics
    (computation cost, memory, etc) stay the same, reducing the number of
@@ -315,7 +303,7 @@ Table of Contents
    phase.  Splitting protocols into an offline and online phase can help
    reduce the cost of the online phase, but necessarily requires
    coordination between the offline and online phases.  As described in
-   Section 3.1.2, technologies for coordination may or may not be
+   Section 3.2, technologies for coordination may or may not be
    available for a particular deployment environment.
 
    As another example, some applications of zero knowledge proofs
@@ -341,7 +329,7 @@ Table of Contents
    cryptography to reduce the number of rounds from three or more to
    exactly two is often not a desirable tradeoff.
 
-3.1.4.  Bandwidth
+3.4.  Bandwidth
 
    Minimizing bandwidth is an important goal of a cryptographic protocol
    depending on the deployment environment.  Some deployments have
@@ -376,8 +364,9 @@ Table of Contents
    for DNSSEC, especially post quantum signatures, will face these
    bandwidth limits.  Depending on these limits, alternative
    cryptographic solutions may be necessary to solve the problem.  One
-   recent example of this is [DAVIDBEN], wherein all digital signatures
-   in TLS handshake were replaced by compact Merkle Tree proofs.
+   recent example of this is [MERKLETREECERTS], wherein effectively all
+   digital signatures in TLS handshake were replaced by compact Merkle
+   Tree proofs.
 
    Reducing bandwidth to avoid practical or theoretical limits is
    advantageous.  This is especially true if the bandwidth cost exceeds
@@ -390,33 +379,42 @@ Table of Contents
    particular case of Privacy Pass, this may mean that alternate
    cryptographic solutions may be required.
 
-3.2.  Implementation Tradeoffs
+4.  Implementation Considerations
 
    Beyond the functional constraints that one must consider before
    choosing a protocol to deploy, there are also practical
    implementation constraints that affect deployment, including those
-   that are paid up front to ship a solution, and then those that are
-   paid after the solution has been shipped.
+   that are paid up front to ship a solution, referred to as
+   bootstrapping costs, and then those that are paid after the solution
+   has been shipped.
 
-3.2.1.  Bootstrapping Cost
+4.1.  Bootstrapping
 
-   Implementing new cryptography of any form requires care.  Maybe the
-   new cryptography is not yet specified, and thereby the cost of
-   implementing it requires careful collaboration with cryptographic
-   experts.  Alternatively, maybe there are time pressures to deliver a
-   solution for the desired problem in a timely manner, thereby
-   motivating simpler and easier-to-implement solutions, even ones with
-   less-than-ideal security or privacy properties, over more complicated
-   but perhaps ultimately better solutions.
+   Implementing new cryptography of any form always has a cost.  For
+   example, perhaps the new cryptography is not yet specified and exists
+   only in academic literature.  In this case, the cost of implementing
+   it requires careful collaboration with cryptographic experts.  In
+   other cases, perhaps the cryptography is well understood and
+   specified, but for licensing reasons it's not possible to reuse
+   existing implementations.  In this case, the cost comes from re-
+   implementing, which comes with additional risk of introducing bugs
+   not found in other implementations.
 
-   Solutions for products often face this tradeoff, and navigating the
-   space of solutions that are faster and easier to ship compared to
-   truly superior solutions boils down to product priorities.
-   Cryptographic researchers can help mitigate this tradeoff by
-   simplifying their protocols and, ideally, complementing their work
-   with detailed specifications to facilitate implementation.
+   Even when these bootstrapping costs seem small, they may matter in
+   practice.  There are often time pressures to deliver a solution for
+   the desired problem in a timely manner.  Product deadlines push
+   towards simple and easy-to-implement solutions, sometimes even ones
+   with less-than-ideal security or privacy properties, over more
+   complicated but perhaps ultimately better solutions.  Cryptographic
+   researchers can help mitigate this tradeoff in practice by working to
+   ensure that the cost of implementing their work is minimal.  That
+   might mean simplifying protocols, producing technical specifications
+   that faciliate engineering work, producing verified implementations
+   that are provably correct with tools such as [hacspec], or even
+   releasing high quality production software that could be used without
+   license constraints.
 
-3.2.2.  Long-Term Maintenance Cost
+4.2.  Long-Term Maintenance
 
    Perhaps the most important implementation factor to consider when
    choosing a cryptographic solution is the long-term maintenance cost.
@@ -497,7 +495,7 @@ Table of Contents
    cryptographic solution has noticably better functional, security, or
    privacy properties.
 
-3.3.  Ecosystem Tradeoffs
+5.  Ecosystem and Adoption Considerations
 
    Constraints and considerations for cryptographic solutions also
    extend to the ecosystem in which they are deployed.  Cryptographic
@@ -537,7 +535,7 @@ Table of Contents
    will lean towards solutions built on NIST curves, as doing so
    accommodates existing deployed infrastructure.
 
-4.  General Recommendations
+6.  General Recommendations
 
    This document discusses a number of considerations and constraints
    that influence how engineering decisions are made.  Again, there is
@@ -567,19 +565,19 @@ Table of Contents
        isolation or secret, but where feasible, leverage the
        opportunity.
 
-5.  Security Considerations
+7.  Security Considerations
 
    This document discusses considerations relevant to the implementation
    and deployment of cryptography in practice.  The document is
    effectively a collection of security considerations.
 
-6.  IANA Considerations
+8.  IANA Considerations
 
    This document has no IANA actions.
 
-7.  References
+9.  References
 
-7.1.  Normative References
+9.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -590,23 +588,41 @@ Table of Contents
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
 
-7.2.  Informative References
+9.2.  Informative References
 
-   [BBS]      "*** BROKEN REFERENCE ***".
+   [BBS]      Looker, T., Kalos, V., Whitehead, A., and M. Lodder, "The
+              BBS Signature Scheme", Work in Progress, Internet-Draft,
+              draft-irtf-cfrg-bbs-signatures-02, 11 March 2023,
+              <https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-
+              bbs-signatures-02>.
 
    [BLINDRSA] Denis, F., Jacobs, F., and C. A. Wood, "RSA Blind
               Signatures", Work in Progress, Internet-Draft, draft-irtf-
-              cfrg-rsa-blind-signatures-11, 16 February 2023,
+              cfrg-rsa-blind-signatures-12, 3 April 2023,
               <https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-
-              rsa-blind-signatures-11>.
+              rsa-blind-signatures-12>.
 
-   [BLS]      "*** BROKEN REFERENCE ***".
+   [BLS]      Boneh, D., Gorbunov, S., Wahby, R. S., Wee, H., Wood, C.
+              A., and Z. Zhang, "BLS Signatures", Work in Progress,
+              Internet-Draft, draft-irtf-cfrg-bls-signature-05, 16 June
+              2022, <https://datatracker.ietf.org/doc/html/draft-irtf-
+              cfrg-bls-signature-05>.
 
    [FROST]    Connolly, D., Komlo, C., Goldberg, I., and C. A. Wood,
               "Two-Round Threshold Schnorr Signatures with FROST", Work
-              in Progress, Internet-Draft, draft-irtf-cfrg-frost-12, 24
-              January 2023, <https://datatracker.ietf.org/doc/html/
-              draft-irtf-cfrg-frost-12>.
+              in Progress, Internet-Draft, draft-irtf-cfrg-frost-13, 8
+              May 2023, <https://datatracker.ietf.org/doc/html/draft-
+              irtf-cfrg-frost-13>.
+
+   [hacspec]  "hacspec: A specification language for crypto primitives
+              in Rust", n.d., <https://github.com/hacspec/hacspec>.
+
+   [MERKLETREECERTS]
+              Benjamin, D., O'Brien, D., and B. Westerbaan, "Merkle Tree
+              Certificates for TLS", Work in Progress, Internet-Draft,
+              draft-davidben-tls-merkle-tree-certs-00, 10 March 2023,
+              <https://datatracker.ietf.org/doc/html/draft-davidben-tls-
+              merkle-tree-certs-00>.
 
    [STAR]     Davidson, A., Sahib, S. K., Snyder, P., and C. A. Wood,
               "STAR: Distributed Secret Sharing for Private Threshold
