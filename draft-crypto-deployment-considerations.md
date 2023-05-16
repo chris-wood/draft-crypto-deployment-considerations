@@ -147,7 +147,7 @@ cryptographic protocol.
 exchange protocol, that only exists for the duration of a given cryptographic protocol
 and is effectively captured or constrained within the state machine of a protocol.
 
-Minimizing all three types of state or memory is generally infeasible; every solution
+Minimizing these types of state or memory is generally infeasible; every solution
 inevitably requires some form of state. Moreover, there is generally no best answer
 for which type of state to minimize. Considerations that apply to each are below.
 
