@@ -4,8 +4,8 @@
 
 Network Working Group                                         C. A. Wood
 Internet-Draft                                                Cloudflare
-Intended status: Informational                              6 April 2023
-Expires: 8 October 2023
+Intended status: Informational                               16 May 2023
+Expires: 17 November 2023
 
 
          Deployment Considerations for Cryptographic Protocols
@@ -49,7 +49,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 8 October 2023.
+   This Internet-Draft will expire on 17 November 2023.
 
 Copyright Notice
 
@@ -211,10 +211,10 @@ Table of Contents
        duration of a given cryptographic protocol and is effectively
        captured or constrained within the state machine of a protocol.
 
-   Minimizing all three types of state or memory is generally
-   infeasible; every solution inevitably requires some form of state.
-   Moreover, there is generally no best answer for which type of state
-   to minimize.  Considerations that apply to each are below.
+   Minimizing these types of state or memory is generally infeasible;
+   every solution inevitably requires some form of state.  Moreover,
+   there is generally no best answer for which type of state to
+   minimize.  Considerations that apply to each are below.
 
    1.  Long-term state.  Minimizing this type of state simplifies
        management.  For example, in the case of long-term private keys,
@@ -610,9 +610,9 @@ Table of Contents
 
    [FROST]    Connolly, D., Komlo, C., Goldberg, I., and C. A. Wood,
               "Two-Round Threshold Schnorr Signatures with FROST", Work
-              in Progress, Internet-Draft, draft-irtf-cfrg-frost-12, 24
-              January 2023, <https://datatracker.ietf.org/doc/html/
-              draft-irtf-cfrg-frost-12>.
+              in Progress, Internet-Draft, draft-irtf-cfrg-frost-13, 8
+              May 2023, <https://datatracker.ietf.org/doc/html/draft-
+              irtf-cfrg-frost-13>.
 
    [hacspec]  "hacspec: A specification language for crypto primitives
               in Rust", n.d., <https://github.com/hacspec/hacspec>.
