@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2023-04-09T00:03:15.266379+00:00",
+  "timestamp": "2023-05-18T00:03:12.300825+00:00",
   "repo": "chris-wood/draft-crypto-deployment-considerations",
   "labels": [
     {
@@ -111,6 +111,22 @@
       "body": "From @bwesterb:\r\n\r\n> Cryptography protocols should come with concrete chosen parameters.",
       "createdAt": "2023-04-06T10:13:01Z",
       "updatedAt": "2023-04-06T10:13:01Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 9,
+      "id": "I_kwDOJQZP185mKyKK",
+      "title": "Long-term state and distributed participants",
+      "url": "https://github.com/chris-wood/draft-crypto-deployment-considerations/issues/9",
+      "state": "OPEN",
+      "author": "nikitaborisov",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "I like how you call out the issues of consistency in the long-term state discussion. One thing that might be worth pointing out is that a protocol that may look like a simple two-party protocol can in fact turn into a distributed protocol when implemented. E.g., a cryptographer might think mTLS is a protocol between a client and server, but when actually implementing it, the client may actually want keys stored on multiple devices, and the server may be distributed across a bunch of servers for parallelism and locality. \r\n\r\nThis suggests two axes that are important to consider in terms of long-term state:\r\n1. How often does the state change? A never-changing state (e.g., private keys in TPMs) is easiest to support; most long-term private keys will be in the rarely changing bucket since key rotation must be supported, but some protocol state must change all the time, such as anything to do with replay protection\r\n2. What are the consistency requirements? Can the protocol tolerate some level of inconsistency? When things are inconsistent, do you have a recovery mechanism? An availability failure? A security failure?\r\n\r\n",
+      "createdAt": "2023-05-17T14:58:04Z",
+      "updatedAt": "2023-05-17T14:58:04Z",
       "closedAt": null,
       "comments": []
     }
